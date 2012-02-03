@@ -1,7 +1,10 @@
+# Please see LICENSE.txt for copyright and license information.
+
 require 'rack/auth/oauth/request'
 require 'active_support/inflector/methods'
 
-# middleware for tokenless OAuth 1.0 provider
+# Middleware for tokenless OAuth 1.0 provider
+#
 module Rack::Auth::Oauth
   class Tokenless
     attr_reader :request, :client
@@ -15,7 +18,9 @@ module Rack::Auth::Oauth
       @app = app
     end
 
-    # Implements call according to Rack protocol
+    # Implements call according to Rack protocol. Goes through
+    # a series of checks against the incoming request ultimately
+    # setting a successfully authorized client in request env.
     #
     # params:
     #   env - Rack env
@@ -33,17 +38,23 @@ module Rack::Auth::Oauth
       end
     end
 
+    # Get a reference to the class the middleware user would like
+    # to use as a Client
+    #
     def client_class
       ActiveSupport::Inflector.constantize(self.class.client_class)
     end
 
     # TODO: make this a config option passed to use
+    #
     def self.client_class
       'Client'
     end
 
-    # find the client based on incoming oauth consumer key
-    # returns the verification status
+    # Find the client based on incoming oauth consumer key
+    #
+    # returns: the verification status
+    #
     def client_verified?
       @client = client_class.find_by_consumer_key(request.consumer_key)
       request.verify_signature(@client)

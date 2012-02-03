@@ -1,8 +1,12 @@
+# Please see LICENSE.txt for copyright and license information.
+
 require 'rack/auth/abstract/request'
 require 'rack/auth/oauth/params'
 require 'oauth'
 require 'oauth/request_proxy/rack_request'
 
+# An OAuth flavored extension to Rack::Auth::AbstractRequest
+#
 module Rack::Auth::Oauth
   class Request < Rack::Auth::AbstractRequest
 
@@ -34,6 +38,11 @@ module Rack::Auth::Oauth
       end
     end
 
+    # Verify the request using a clients secret
+    #
+    # args:
+    #   client - A model that has both defines both consumer_secret and consumer_key
+    #
     def verify_signature(client)
       return false unless client
       OAuth::Signature.verify(request, :consumer_secret => client.consumer_secret)
