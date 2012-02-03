@@ -23,18 +23,18 @@ module Rack::Auth::Oauth
     def with_valid_request
       if provided?
         if !oauth?
-          [401, {}, "Incorrect authorization scheme, must be OAuth 1.0"]
+          [401, {}, ["Incorrect authorization scheme, must be OAuth 1.0"]]
         elsif params.missing_consumer_key?
-          [401, {}, "Unspecified OAuth consumer key"]
+          [401, {}, ["Unspecified OAuth consumer key"]]
         elsif params.missing_signature?
-          [401, {}, "Missing signature in OAuth request"]
+          [401, {}, ["Missing signature in OAuth request"]]
         elsif params.missing_signature_method?
-          [401, {}, "Missing signature method in OAuth request"]
+          [401, {}, ["Missing signature method in OAuth request"]]
         else
           yield(request.env)
         end
       else
-        [401, {}, "Unauthorized"]
+        [401, {}, ["Unauthorized"]]
       end
     end
 

@@ -34,7 +34,7 @@ module Rack::Auth::Oauth
           env["oauth_client"] = client
           @app.call(env)
         else
-          [401, {}, "Unauthorized"]
+          [401, {}, ["Unauthorized"]]
         end
       end
     end
