@@ -1,14 +1,10 @@
 # Purpose
 
-This rack middleware implements a two-legged tokenless OAuth provider.
-
-The protocol is discussed at length at the following link:
-
-[RFC 5849 3.2](http://tools.ietf.org/html/rfc5849#section-3)
+This rack middleware implements a two-legged tokenless OAuth provider. The protocol is discussed at length here: [RFC 5849 3.2](http://tools.ietf.org/html/rfc5849#section-3)
 
 # Example Usage
 
-### Rails
+### Using it with Rails 3.x
 
 Include the middleware in your rails config (for example, in config/application.rb)
 
@@ -17,7 +13,6 @@ Include the middleware in your rails config (for example, in config/application.
 Example::Application.configure do
   config.middleware.use Rack::Auth::Oauth::Tokenless
 end
-
 ```
 
 # Contributing
