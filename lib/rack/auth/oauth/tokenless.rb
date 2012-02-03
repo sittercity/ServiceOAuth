@@ -7,15 +7,16 @@ require 'active_support/inflector/methods'
 #
 module Rack::Auth::Oauth
   class Tokenless
-    attr_reader :request, :client
+    attr_reader :request, :client, :client_class_name
 
     # Sets the the app that the middleware delegates to
     #
     # params:
     #   app - a rack endpoint or middleware
     #
-    def initialize(app)
-      @app = app
+    def initialize(app, client_class_name="Client")
+      @app               = app
+      @client_class_name = client_class_name
     end
 
     # Implements call according to Rack protocol. Goes through
@@ -42,13 +43,7 @@ module Rack::Auth::Oauth
     # to use as a Client
     #
     def client_class
-      ActiveSupport::Inflector.constantize(self.class.client_class)
-    end
-
-    # TODO: make this a config option passed to use
-    #
-    def self.client_class
-      'Client'
+      ActiveSupport::Inflector.constantize(@client_class_name)
     end
 
     # Find the client based on incoming oauth consumer key

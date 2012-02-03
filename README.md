@@ -15,10 +15,16 @@ Include the middleware in your rails config (for example, in config/application.
 ```ruby
 
 Example::Application.configure do
-  config.middleware.use Rack::Auth::Oauth::Tokenless
+  # Client class will default to Client if not passed a custom class name
+  config.middleware.use Rack::Auth::Oauth::Tokenless, "CustomClientClass"
 end
 
 ```
+
+### "Client" Class Expectations
+
+* Must define both consumer_key and consumer_secret attributes
+* "Client" class must respond to YourClientClass#find_by_consumer_key(consumer_key)
 
 # Contributing
 
@@ -27,7 +33,6 @@ Fork the project, add your fix (with tests), and send a pull request
 # TODO
 
 * Improve README.md
-* Configure custom client class name
 
 # License
 
