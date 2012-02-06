@@ -42,7 +42,8 @@ module Rack::Auth::Oauth
     #
     def verify_signature(client)
       return false unless client
-      header = SimpleOAuth::Header.new(request.request_method, request.url, request.params, auth_header)
+
+      header = SimpleOAuth::Header.new(request.request_method, request.url, included_request_params, auth_header)
       header.valid?(:consumer_secret => client.consumer_secret)
     end
 
@@ -67,7 +68,11 @@ module Rack::Auth::Oauth
     private
 
     def auth_header # :nodoc:
-      @auth_header ||= @env[authorization_key]
+      @env[authorization_key]
+    end
+
+    def included_request_params # :nodoc:
+      request.content_type == "application/x-www-form-urlencoded" ? request.params : nil
     end
 
   end
