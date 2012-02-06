@@ -14,7 +14,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = "0.0.1"
 
-  gem.add_dependency 'oauth', "~> 0.4.5"
+  gem.add_dependency 'simple_oauth'
   gem.add_dependency 'activesupport', '>= 3.0.0'
   gem.add_development_dependency 'rspec', '~> 2.7'
   gem.add_development_dependency 'rack-test'

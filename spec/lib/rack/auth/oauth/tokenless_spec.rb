@@ -107,16 +107,13 @@ describe Rack::Auth::Oauth::Tokenless do
 
       context 'client secret unsuccessfully authenticates request' do
 
-        let(:env) { Rack::MockRequest.env_for('/') }
-        let(:request) { Rack::Request.new(env) }
-        let(:consumer_key) { DummyClient::DUMMY_KEY }
-        let(:wrong_consumer_secret) { "!#{DummyClient::DUMMY_SECRET}" }
-        let(:consumer) { OAuth::Consumer.new(consumer_key, wrong_consumer_secret) }
-        let(:client_helper) { OAuth::Client::Helper.new(request, { :consumer => consumer }) }
-        let(:valid_auth_header) { { "HTTP_AUTHORIZATION" => client_helper.header } }
+        let(:test_uri) { "http://example.com" }
+        let(:incorrect_secret) { "!!#{DummyClient::DUMMY_SECRET}!!" }
+        let(:consumer_credentials) {{ :consumer_key => DummyClient::DUMMY_KEY, :consumer_secret => incorrect_secret }}
+        let(:invalid_auth_header) {{ "HTTP_AUTHORIZATION" => SimpleOAuth::Header.new(:get, test_uri, {}, consumer_credentials).to_s }}
 
-        it 'has a successful response' do
-          resp = mock_request.get("/", valid_auth_header)
+        it 'deems the request unauthorized' do
+          resp = mock_request.get(test_uri, invalid_auth_header)
           resp.status.should == 401
         end
 
@@ -124,16 +121,12 @@ describe Rack::Auth::Oauth::Tokenless do
 
       context 'has oauth_consumer_key, oauth_signature, and oauth_signature_method and specifies OAuth protocol' do
 
-        let(:env) { Rack::MockRequest.env_for('/') }
-        let(:request) { Rack::Request.new(env) }
-        let(:consumer_key) { DummyClient::DUMMY_KEY }
-        let(:consumer_secret) { DummyClient::DUMMY_SECRET }
-        let(:consumer) { OAuth::Consumer.new(consumer_key, consumer_secret) }
-        let(:client_helper) { OAuth::Client::Helper.new(request, { :consumer => consumer }) }
-        let(:valid_auth_header) { { "HTTP_AUTHORIZATION" => client_helper.header } }
+        let(:test_uri) { "http://example.com" }
+        let(:consumer_credentials) {{ :consumer_key => DummyClient::DUMMY_KEY, :consumer_secret => DummyClient::DUMMY_SECRET }}
+        let(:valid_auth_header) {{ "HTTP_AUTHORIZATION" => SimpleOAuth::Header.new(:get, test_uri, {}, consumer_credentials).to_s }}
 
         it 'has a successful response' do
-          resp = mock_request.get("/", valid_auth_header)
+          resp = mock_request.get(test_uri, valid_auth_header)
           resp.status.should == 200
         end
 

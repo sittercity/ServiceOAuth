@@ -1,9 +1,6 @@
 # Please see LICENSE.txt for copyright and license information.
 
 require 'rack/auth/abstract/request'
-require 'rack/auth/oauth/params'
-require 'oauth'
-require 'oauth/request_proxy/rack_request'
 
 # An OAuth flavored extension to Rack::Auth::AbstractRequest
 #
@@ -24,11 +21,11 @@ module Rack::Auth::Oauth
       if provided?
         if !oauth?
           [401, {}, ["Incorrect authorization scheme, must be OAuth 1.0"]]
-        elsif params.missing_consumer_key?
+        elsif params[:consumer_key].nil?
           [401, {}, ["Unspecified OAuth consumer key"]]
-        elsif params.missing_signature?
+        elsif params[:signature].nil?
           [401, {}, ["Missing signature in OAuth request"]]
-        elsif params.missing_signature_method?
+        elsif params[:signature_method].nil?
           [401, {}, ["Missing signature method in OAuth request"]]
         else
           yield(request.env)
@@ -45,19 +42,32 @@ module Rack::Auth::Oauth
     #
     def verify_signature(client)
       return false unless client
-      OAuth::Signature.verify(request, :consumer_secret => client.consumer_secret)
+      header = SimpleOAuth::Header.new(request.request_method, request.url, request.params, auth_header)
+      header.valid?(:consumer_secret => client.consumer_secret)
     end
 
-    def consumer_key
-      params['oauth_consumer_key']
-    end
-
+    # Parse the header params from the Authorization header
+    #
     def params
-      @params ||= Params.parse(@env[authorization_key])
+      @params ||= SimpleOAuth::Header.parse(auth_header)
     end
 
+    # Grab the consumer key from the header params
+    #
+    def consumer_key
+      params[:consumer_key]
+    end
+
+    # Check that the Authorization header is specifying the oauth scheme
+    #
     def oauth?
       :oauth == scheme
+    end
+
+    private
+
+    def auth_header # :nodoc:
+      @auth_header ||= @env[authorization_key]
     end
 
   end
